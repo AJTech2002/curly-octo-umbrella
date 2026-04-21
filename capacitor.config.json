@@ -1,0 +1,10 @@
+{
+  "appId": "com.ajayvenkat.earthly",
+  "appName": "Earthly",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}
