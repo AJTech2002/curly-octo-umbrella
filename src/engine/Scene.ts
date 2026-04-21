@@ -1,10 +1,12 @@
 import * as THREE from 'three/webgpu';
 import type GameObject from './GameObject.js';
+import type Renderer from './Renderer.js';
 
 export default abstract class GameScene extends THREE.Scene {
     protected readonly camera: THREE.PerspectiveCamera;
     protected gameObjects: GameObject[] = [];
     protected started = false;
+    public renderer?: Renderer;
 
     constructor() {
         super();

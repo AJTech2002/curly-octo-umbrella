@@ -2,8 +2,8 @@ import * as THREE from 'three/webgpu';
 import GameScene from './Scene.js';
 
 export default class Renderer {
-    private readonly renderer: THREE.WebGPURenderer;
-    private readonly scene: GameScene;
+    public readonly renderer: THREE.WebGPURenderer;
+    public readonly scene: GameScene;
     private previousTime = 0;
 
     constructor(canvas: HTMLCanvasElement, scene: GameScene) {
@@ -14,6 +14,7 @@ export default class Renderer {
     }
 
     start(): void {
+        this.scene.renderer = this;
         this.scene.start();
         this.previousTime = performance.now();
         window.addEventListener('resize', this.handleResize);

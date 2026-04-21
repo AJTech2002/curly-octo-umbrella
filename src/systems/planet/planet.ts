@@ -1,25 +1,32 @@
 import GameObject from "../../engine/GameObject.js";
 import type GameScene from "../../engine/Scene.js";
 import * as THREE from 'three/webgpu';
+import PlanetFace from "./planetFace.js";
 
 export default class Planet extends GameObject {
 
-    private readonly cube: THREE.Mesh;
+    private faces: PlanetFace[] = [];
+    private readonly directions = [
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(0, -1, 0),
+        new THREE.Vector3(1, 0, 0),
+        new THREE.Vector3(-1, 0, 0),
+        new THREE.Vector3(0, 0, 1),
+        new THREE.Vector3(0, 0, -1)
+    ];
+
     private elapsedTime = 0;
 
     constructor(scene: GameScene) {
         super(scene);
+        const resolution = 10;
+        for (const dir of this.directions) {
+            this.faces.push(new PlanetFace(scene, resolution, dir));
+        }
 
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshStandardMaterial({
-            color: 0x00ff00,
-            metalness: 0.8,
-            roughness: 0.2,
-            envMapIntensity: 1.0,
-        });
-
-        this.cube = new THREE.Mesh(geometry, material);
-        this.add(this.cube);
+        for (const face of this.faces) {
+            this.addGameObject(face);
+        }
     }
 
     public start(): void {
@@ -29,11 +36,7 @@ export default class Planet extends GameObject {
     public update(dt: number): void {
         super.update(dt);
         this.elapsedTime += dt;
-
-        this.cube.rotation.x += 0.6 * dt;
-        this.cube.rotation.y += 0.6 * dt;
-
-        const pulse = Math.sin(this.elapsedTime) * 0.5 + 1;
-        this.cube.scale.set(pulse, pulse, pulse);
+        this.rotateX(0.2 * dt);
+        this.rotateY(0.5 * dt);
     }
 }
