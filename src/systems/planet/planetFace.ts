@@ -1,19 +1,23 @@
+import { SimplexNoise } from "three/examples/jsm/Addons.js";
 import GameObject from "../../engine/GameObject.js";
 import type GameScene from "../../engine/Scene.js";
 import * as THREE from "three/webgpu";
+import type Planet from "./planet.js";
 
 export default class PlanetFace extends GameObject {
 
-    private mesh: THREE.Mesh;
+    private mesh?: THREE.Mesh;
     private resolution: number;
     private localUp: THREE.Vector3;
     private axisA: THREE.Vector3;
     private axisB: THREE.Vector3;
+    private planet: Planet;
 
-    constructor(scene: GameScene, resolution: number, localUp: THREE.Vector3) {
+    constructor(scene: GameScene, resolution: number, localUp: THREE.Vector3, planet: Planet) {
         super(scene);
         this.resolution = resolution;
         this.localUp = localUp;
+        this.planet = planet;
 
         if (Math.abs(localUp.x) < 0.9) {
             this.axisA = new THREE.Vector3(1, 0, 0);
@@ -27,6 +31,27 @@ export default class PlanetFace extends GameObject {
             .normalize();
 
         this.constructMesh();
+    }
+
+    private calculatePointOnPlanet(unitSpherePoint: THREE.Vector3): THREE.Vector3 {
+        let noiseValue = 0;
+        let frequency = this.planet.settings.baseRoughness;
+        let amplitude = 1;
+
+        for (let i = 0; i < this.planet.settings.numLayers; i++) {
+            const v = unitSpherePoint.clone().multiplyScalar(frequency).add(this.planet.settings.center);
+            const n = this.planet.noise.noise3d(v.x, v.y, v.z) * 0.5 + 0.5;
+            noiseValue += n * amplitude;
+
+            frequency *= this.planet.settings.roughness;
+            amplitude *= this.planet.settings.persistence;
+        }
+
+        let final = unitSpherePoint.multiplyScalar(1 + noiseValue * this.planet.settings.noiseStrength);
+        if (final.length() < this.planet.settings.minValue) {
+            final = final.normalize().multiplyScalar(this.planet.settings.minValue);
+        }
+        return final;
     }
 
     private constructMesh(): void {
@@ -55,7 +80,7 @@ export default class PlanetFace extends GameObject {
                             )
                     )
 
-                var pointOnUnitSphere = pointOnUnitCube.clone().normalize();
+                var pointOnUnitSphere = this.calculatePointOnPlanet(pointOnUnitCube.clone().normalize());
 
                 vertices[i * 3] = pointOnUnitSphere.x;
                 vertices[i * 3 + 1] = pointOnUnitSphere.y;
@@ -79,7 +104,8 @@ export default class PlanetFace extends GameObject {
         geometry.computeVertexNormals();
         geometry.computeBoundingBox();
 
-        const material = new THREE.MeshNormalMaterial({ color: 0x88ccff, side: THREE.DoubleSide, wireframe: true, wireframeLinewidth: 10 });
+        // const material = new THREE.MeshNormalMaterial({ color: 0x88ccff, side: THREE.DoubleSide, wireframe: false, wireframeLinewidth: 10 });
+        const material = new THREE.MeshStandardMaterial({ color: 0x88ccff, side: THREE.DoubleSide, wireframe: false });
         this.mesh = new THREE.Mesh(geometry, material);
         this.add(this.mesh);
         material.needsUpdate = true;
