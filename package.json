@@ -19,10 +19,12 @@
     "@capacitor/ios": "^8.3.1",
     "@capacitor/splash-screen": "latest",
     "@types/three": "^0.184.0",
+    "dat.gui": "^0.7.9",
     "three": "^0.184.0"
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
+    "@types/dat.gui": "^0.7.13",
     "typescript": "^6.0.3",
     "vite": "^7.3.1"
   },

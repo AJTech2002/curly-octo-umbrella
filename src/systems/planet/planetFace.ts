@@ -6,7 +6,7 @@ import type Planet from "./planet.js";
 
 export default class PlanetFace extends GameObject {
 
-    private mesh?: THREE.Mesh;
+    private mesh: THREE.Mesh | undefined;
     private resolution: number;
     private localUp: THREE.Vector3;
     private axisA: THREE.Vector3;
@@ -55,6 +55,18 @@ export default class PlanetFace extends GameObject {
     }
 
     private constructMesh(): void {
+        if (this.mesh) {
+            this.remove(this.mesh);
+            this.mesh.geometry.dispose();
+
+            const material = this.mesh.material;
+            if (Array.isArray(material)) {
+                material.forEach((entry) => entry.dispose());
+            } else {
+                material.dispose();
+            }
+        }
+
         const geometry = new THREE.BufferGeometry();
         const vertices: number[] = [];
         const indices: number[] = [];
@@ -109,9 +121,29 @@ export default class PlanetFace extends GameObject {
         this.mesh = new THREE.Mesh(geometry, material);
         this.add(this.mesh);
         material.needsUpdate = true;
+    }
 
+    public rebuild(resolution = this.resolution): void {
+        this.resolution = resolution;
+        this.constructMesh();
+    }
 
-        console.log(this.mesh);
+    public dispose(): void {
+        if (!this.mesh) {
+            return;
+        }
+
+        this.remove(this.mesh);
+        this.mesh.geometry.dispose();
+
+        const material = this.mesh.material;
+        if (Array.isArray(material)) {
+            material.forEach((entry) => entry.dispose());
+        } else {
+            material.dispose();
+        }
+
+        this.mesh = undefined;
     }
 
     public start(): void {

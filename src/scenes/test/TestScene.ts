@@ -3,11 +3,13 @@ import GameScene from '../../engine/Scene.js';
 import { createEnvironmentMap } from '../../utils/createEnvironmentMap.js';
 import Planet from '../../systems/planet/planet.js';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import SettingsGUI from '../../ui/SettingsGUI.js';
 export default class TestScene extends GameScene {
     private elapsedTime = 0;
 
     private planet: Planet;
     private controls!: OrbitControls;
+    private settingsGUI!: SettingsGUI;
 
     constructor() {
         super();
@@ -21,6 +23,7 @@ export default class TestScene extends GameScene {
         super.start();
         this.controls = new OrbitControls(this.camera, this.renderer!.renderer.domElement);
         this.controls.enableDamping = true;
+        this.settingsGUI = new SettingsGUI(this.planet);
 
         const environmentMap = createEnvironmentMap();
         this.environment = environmentMap;

@@ -4,7 +4,7 @@ import * as THREE from 'three/webgpu';
 import PlanetFace from "./planetFace.js";
 import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise.js";
 
-interface PlanetSettings {
+export interface PlanetSettings {
     resolution: number;
 
     // noise settings
@@ -20,11 +20,12 @@ interface PlanetSettings {
 export default class Planet extends GameObject {
 
     private faces: PlanetFace[] = [];
+    private readonly scene: GameScene;
     public noise: SimplexNoise = new SimplexNoise();
-    public readonly settings: PlanetSettings = {
-        resolution: 40,
+    public settings: PlanetSettings = {
+        resolution: 70,
         noiseStrength: 0.2,
-        numLayers: 5,
+        numLayers: 3,
         baseRoughness: 1,
         roughness: 2,
         persistence: 0.5,
@@ -45,17 +46,33 @@ export default class Planet extends GameObject {
 
     constructor(scene: GameScene, settings?: Partial<PlanetSettings>) {
         super(scene);
+        this.scene = scene;
 
         this.settings = { ...this.settings, ...settings };
 
+        this.buildFaces();
+    }
+
+    private buildFaces(): void {
         const resolution = this.settings.resolution;
         for (const dir of this.directions) {
-            this.faces.push(new PlanetFace(scene, resolution, dir, this));
+            this.faces.push(new PlanetFace(this.scene, resolution, dir, this));
         }
 
         for (const face of this.faces) {
             this.addGameObject(face);
         }
+    }
+
+    public rebuild(): void {
+        for (const face of this.faces) {
+            face.dispose();
+            this.remove(face);
+        }
+
+        this.faces = [];
+        this.gameObjects = [];
+        this.buildFaces();
     }
 
     public start(): void {
