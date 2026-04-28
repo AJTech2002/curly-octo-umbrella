@@ -18,7 +18,10 @@ export default class Renderer {
         this.scene.start();
         this.previousTime = performance.now();
         window.addEventListener('resize', this.handleResize);
-        requestAnimationFrame(this.animate);
+        this.renderer.init().then(() => {
+            requestAnimationFrame(this.animate);
+
+        })
     }
 
     private animate = (time: number): void => {
@@ -26,7 +29,7 @@ export default class Renderer {
         this.previousTime = time;
 
         this.scene.update(dt);
-        void this.renderer.renderAsync(this.scene, this.scene.activeCamera);
+        void this.renderer.render(this.scene, this.scene.activeCamera);
 
         requestAnimationFrame(this.animate);
     };
