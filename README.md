@@ -1,12 +1,6 @@
-## Created with Capacitor Create App
+## Simple Focus App
 
-This app was created using [`@capacitor/create-app`](https://github.com/ionic-team/create-capacitor-app),
-and comes with a very minimal shell for building an app.
+Earth visuals in ThreeJS, TSL and WebGPU.
 
-### Running this example
+<img width="628" height="502" alt="Screenshot 2026-04-28 at 11 02 26 am" src="https://github.com/user-attachments/assets/03efb060-a177-4fcc-82bf-bbb878a077c1" />
 
-To run the provided example, you can use `npm start` command.
-
-```bash
-npm start
-```
